@@ -1,8 +1,9 @@
 <?php
 
-    session_start();
+    $results = $_GET["results"];
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es-VE">
@@ -16,14 +17,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <title>Tienda de Electrónica</title>
+    <title>Mostrando resultados de <?php echo $results?></title>
 </head>
 <header>
     <nav class="navbar navbar-expand-lg bg-white">
         <div class="navbar-nav ms-4 me-auto">
             <a class="navbar-brand" href="index.php"><h3 class="text-warning">MEGA<span class="text-black">TRONIC</span></h3></a>
             <form class="d-flex" action="index_search.php" type="search" method="get">
-                <input class="form-control me-2" type="search" placeholder="Buscar productos" name="results" required/>
+                <input class="form-control me-2" type="search" placeholder="Buscar productos" name="results" required />
                 <button class="btn btn-dark px-3" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
             </form>
         </div>
@@ -39,51 +40,24 @@
                 <li class="nav-item">
                     <a class="nav-link" href="admin/create_product.php">Crear producto</a>
                 </li>
-                <?php
-                if( isset($_SESSION['id']) ){
-                    echo "
-                    <li class='nav-item'>
-                        <div class='dropdown'>
-                            <a href='#' class='btn btn-dark dropdown-toggle' role='button' data-bs-toggle='dropdown' ><i class='fa-solid fa-wrench me-2'></i>" . $_SESSION['user'] . "</a>
-                            <ul class='dropdown-menu'>
-                                <li><a href='' class='dropdown-item'>Mi perfil</a></li>
-                                <li><a href='controllers/logout_controller.php' class='dropdown-item text-danger'>Cerrar sesión</a></li>
-                            </ul>
-                        </div>
-                    </li>";
-                } else {
-                    echo "
-                    <li class='nav-item'>
-                        <a class='nav-link' href='login.php'>Iniciar sesión</a>
-                    </li>
-                    ";
-                }
-                
-                ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="">Mi perfil</a>
+                </li>
             </ul>
         </div>
     </nav>
 </header>
 
 <body class="bg-dark">
-    <section id="intro">
-        <div class="container-fluid d-flex text-white align-items-center justify-content-center text-center"
-            style="background-image: url(assets/pexels_fondo.JPG); height: 50vh; background-size: cover; background-position: center;">
-            <div>
-                <h1 style="font-size: 56px;">Tienda de Electrónica</h1>
-                <p>Aquí podrás comprar todos los suplementos y artículos de electrónica de la más alta calidad.</p>
-            </div>
-        </div>
-    </section>
-    <section id="productos-pop">
+    <section id="resultados-productos">
         <div class="row m-5">
             <div class="col-8 offset-2 text-white">
                 <div>
-                    <h3>Productos populares</h3>
+                    <h3>Resultados para "<?php echo $results?>"</h3>
                     <div style="grid-template-columns: 1fr 1fr 1fr 1fr" class="d-grid gap-3 my-4">
                         <?php
                         include "model/conn.php";
-                        $sql = $conn->query("select * from productos limit 8");
+                        $sql = $conn->query("select * from productos where product_name like '%$results%' ");
                         while ($item = $sql->fetch_object()){ ?>
                         <div class="card" style="width: 15rem; ">
                             <img src="<?= $item->product_image ?>" class="card-img-top" alt="">
@@ -95,12 +69,15 @@
                         </div>
                         <?php 
                         }
+
+                        $resultCantidad = mysqli_num_rows($sql);
+                        if( $resultCantidad < 1 ){
+                            echo "<p>No hay resultados</p>";
+                        }
+
                         ?>
                     </div>
                 </div>
-            </div>
-            <div class="text-center">
-                <button type="button" class="btn btn-light">Ver todos los productos</button>
             </div>
         </div>
     </section>
